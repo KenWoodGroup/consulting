@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LogOut, User, ChevronDown, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Logo from '../../../Images/Logo.png'
+import Logo from '../../../Images/logo.png'
 export default function Header() {
     const navigate = useNavigate();
     const [openMenu, setOpenMenu] = useState(false);
     const menuRef = useRef(null);
-
+// kwfwfjwejfwefwefwefwfewfwef
     const handleLogout = () => {
         localStorage.clear();
         navigate("/login");
