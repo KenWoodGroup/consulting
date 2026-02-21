@@ -1,48 +1,73 @@
 import React, { useState } from "react";
 import { Button, Input } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import axios from "../../utils/axios";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { Auth } from "../../utils/Controllers/Auth"; // путь подкорректируй под свой проект
+import { Auth } from "../../utils/Controllers/Auth";
 import { Alert } from "../../utils/Alert";
 
-
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("+998");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const { data } = await Auth.Login({ username, password });
-      const { access_token, role } = data?.data || {}
-      localStorage.setItem("token", access_token);
-      const roleMap = {
-        SUPR_ADMIN: "SPAfefefeUID",
-        ADMIN: "AutngergUID",
-        SELLER: "SefwfmgrUID",
-      };
 
-      localStorage.setItem("qwer", roleMap[role] || "");
+      const { data } = await Auth.Login({
+        phone,
+        password,
+      });
+
+      const user = data?.user;
+      const tokens = data?.tokens;
+
+      if (!tokens?.access_token || !tokens?.refresh_token) {
+        throw new Error("Token topilmadi");
+      }
+
+      // ✅ Сохраняем токены
+      localStorage.setItem("access_token", tokens.access_token);
+      localStorage.setItem("refresh_token", tokens.refresh_token);
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // ✅ Проверка ролей
+      const allowedRoles = ["super_admin", "admin", "customer"];
+
+      if (!allowedRoles.includes(user?.role)) {
+        Alert("Sizga ruxsat yo‘q", "error");
+        return;
+      }
 
       Alert("Muvaffaqiyatli", "success");
-      navigate('/')
+
+      if (user.role === "super_admin") {
+        navigate("/super-admin/dashboard");
+      } else if (user.role === "admin") {
+        navigate("/admin/order");
+      } else if (user.role === "customer") {
+        navigate("/client/order");
+      }
+
     } catch (error) {
-      Alert(error?.response?.data?.message || error.message || "Xatolik yuz berdi", "error");
+      Alert(
+        error?.response?.data?.message ||
+        error.message ||
+        "Xatolik yuz berdi",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -51,58 +76,56 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-neutral-900 to-gray-800 px-2">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-white/20">
-        {/* 🔹 Заголовок сверху */}
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-200">
+
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white tracking-wide">
+          <h1 className="text-3xl font-bold text-gray-800">
             Login
           </h1>
-          <p className="mt-2 text-sm text-gray-300">
+          <p className="mt-2 text-sm text-gray-500">
             Kirish uchun ma'lumotlarni kiriting
           </p>
         </div>
+
         <div className="space-y-6">
+
+          {/* Phone */}
           <div>
-            <label
-              htmlFor="Username"
-              className="block text-sm font-medium text-gray-200 mb-1"
-            >
-              Login
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Telefon raqam
             </label>
             <Input
-              id="Username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder=""
-              className="bg-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-white"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+998901234567"
+              className="!border-gray-300 focus:!border-black"
               crossOrigin={undefined}
             />
           </div>
 
+          {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-200 mb-1"
-            >
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Parol
             </label>
+
             <div className="relative">
               <Input
-                id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="Parolni kiriting"
-                className="bg-white/20 text-white placeholder-gray-400 focus:ring-2 focus:ring-white"
+                className="!border-gray-300 focus:!border-black pr-10"
                 crossOrigin={undefined}
               />
+
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
               >
                 {showPassword ? (
                   <VisibilityOffIcon className="h-5 w-5" />
@@ -112,14 +135,15 @@ const Login = () => {
               </button>
             </div>
           </div>
+
           <Button
             onClick={handleLogin}
             disabled={loading}
-            ripple={true}
-            className="w-full bg-white text-black font-bold py-3 rounded-xl shadow-lg hover:bg-gray-200 transition"
+            className="w-full bg-black text-white font-semibold py-3 rounded-xl shadow-md hover:bg-gray-800 transition"
           >
             {loading ? "Yuklanmoqda..." : "Kirish"}
           </Button>
+
         </div>
       </div>
     </div>

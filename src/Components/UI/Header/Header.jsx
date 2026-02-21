@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { LogOut, User, ChevronDown, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@material-tailwind/react";
-
-export default function AdminHeader({ active, sidebarOpen, ...props }) {
+import Logo from '../../../Images/Logo.png'
+export default function Header() {
     const navigate = useNavigate();
     const [openMenu, setOpenMenu] = useState(false);
     const menuRef = useRef(null);
@@ -30,22 +29,12 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
         <div
             className={`fixed top-[10px] z-30 flex justify-between items-center 
                        mb-6 px-6 py-2 rounded-2xl border shadow-lg 
-                       transition-all duration-500 bg-white backdrop-blur-md border-gray-200`}
-            style={{
-                width: sidebarOpen ? "calc(99% - 250px)" : "91%",
-                left: sidebarOpen ? "250px" : "120px",
-            }}
+                       transition-all duration-500 bg-white backdrop-blur-md border-gray-200 w-[98.5%] left-[10px]`}
         >
-            {/* Левая часть - кнопка меню */}
-            <div className="flex items-center gap-[20px]">
-                <Button
-                    onClick={active}
-                    className="px-2 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white transition-all duration-300"
-                >
-                    <Menu className="w-5 h-5" />
-                </Button>
-            </div>
             {/* Правая часть - профиль */}
+                <div>
+                    <img className="w-[50px]" src={Logo} alt="" />
+                </div>
             <div className="flex items-center gap-4">
                 <div className="relative flex items-center gap-4" ref={menuRef}>
                     <button
@@ -75,7 +64,6 @@ export default function AdminHeader({ active, sidebarOpen, ...props }) {
                             </button>
                         </div>
                     )}
-                    {props.children}
                 </div>
             </div>
         </div>

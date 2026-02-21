@@ -1,10 +1,10 @@
-import Dashboard from "../Components/Dashboard/Dashboard";
+import Client from "../Components/Client";
 
 export const Rout = [
     {
         name: 'Home',
-        path: '/',
-        component: <Dashboard />
+        path: '/client/order',
+        component: <Client />
     },
 
 ]

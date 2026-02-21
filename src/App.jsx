@@ -5,13 +5,35 @@ import { Rout } from "./Routes/Routes";
 import AdminLayout from "./layouts/AdminLayout";
 import Login from "./Components/Login/Login";
 import ErrorPage from "./Components/ErrorPage/ErrorPage";
+import SuperAdminLayout from "./layouts/SuperAdminLayout";
+import { SuperAdminRoutes } from "./Routes/SuperAdminRoutes";
+import { AdminRoutes } from "./Routes/AdminRoutes";
+import MainLayout from "./layouts/MainLayout";
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route path="/login" element={<Login />} />
+          <Route element={<SuperAdminLayout />}>
+            {SuperAdminRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.component}
+              />
+            ))}
+          </Route>
           <Route element={<AdminLayout />}>
+            {AdminRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.component}
+              />
+            ))}
+          </Route>
+          <Route element={<MainLayout />}>
             {Rout.map((route) => (
               <Route
                 key={route.path}
