@@ -12,10 +12,14 @@ export default function Edit({ data, refresh }) {
     const handleOpen = () => setOpen(!open);
 
     const statusOptions = [
-        { value: "pending", label: "Kutilmoqda", color: "yellow" },
-        { value: "process", label: "Jarayonda", color: "blue" },
-        { value: "done", label: "Bajarildi", color: "green" },
-        { value: "cancelled", label: "Bekor qilingan", color: "red" },
+        { value: "pending", label: "Ariza qabul qilindi", color: "gray" },
+        { value: "step_1", label: "Hujjatlar tekshirilmoqda", color: "yellow" },
+        { value: "step_2", label: "Yer huquqi ekspertizasi", color: "blue" },
+        { value: "step_3", label: "Loyiha ko'rib chiqilmoqda", color: "indigo" },
+        { value: "step_4", label: "Tasdiqlash jarayoni", color: "purple" },
+        { value: "step_5", label: "Ruxsatnoma tayyorlanmoqda", color: "teal" },
+        { value: "done", label: "Ruxsatnoma berildi", color: "green" },
+        { value: "cancelled", label: "Rad etildi", color: "red" },
     ];
 
     const handleStatusChange = (value) => {
@@ -26,18 +30,14 @@ export default function Edit({ data, refresh }) {
         try {
             setLoading(true);
 
-            // Здесь ваш API запрос для обновления статуса
             const response = await apiOffers.Edit(data.id, { status: selectedStatus });
 
-            // Имитация запроса
             await new Promise(resolve => setTimeout(resolve, 1000));
             Alert("Muvaffaqiyatli", "success");
-            // Обновляем список заказов
             if (refresh) {
                 refresh();
             }
 
-            // Закрываем модалку
             handleOpen();
         } catch (error) {
             console.error("Statusni o'zgartirishda xatolik:", error);
@@ -49,8 +49,12 @@ export default function Edit({ data, refresh }) {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case "pending": return "text-yellow-600 bg-yellow-50";
-            case "process": return "text-blue-600 bg-blue-50";
+            case "pending": return "text-gray-600 bg-gray-50";
+            case "step_1": return "text-yellow-600 bg-yellow-50";
+            case "step_2": return "text-blue-600 bg-blue-50";
+            case "step_3": return "text-indigo-600 bg-indigo-50";
+            case "step_4": return "text-purple-600 bg-purple-50";
+            case "step_5": return "text-teal-600 bg-teal-50";
             case "done": return "text-green-600 bg-green-50";
             case "cancelled": return "text-red-600 bg-red-50";
             default: return "text-gray-600 bg-gray-50";
